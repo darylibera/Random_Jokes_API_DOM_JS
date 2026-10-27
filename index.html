@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TASK</title>
+    <!-- tail -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- fontawsome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.css"
+      integrity="sha512-x9WwyMYBnlXMNQ6kQ/Lyzu1NqIhLQKL5Oq6xByfXuRj7s9CskyCbLv/1IjqzJmXwFXWr0ov6jBV7Qbc0hh9nHg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <!-- GFontzz -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="bg-black"
+    style="font-family: 'Sour Gummy', sans-serif"
+  >
+    <div
+      class="w-auto min-h-90 flex justify-center items-center flex-col gap-3 border-b-3 border-b-yellow-300 p-3 bg-radial-45 from-yellow-400  from-30%  to-red-600 to-100% "
+    >
+
+    <article class="bg-linear-45 from-red-600  from-67%  to-yellow-400 to-67% p-3 rounded-lg">
+      <div
+        class="min-h-40 sm:min-w-110 sm:max-w-150 w-full bg-black rounded-sm relative overflow-hidden  flex flex-col justify-evenly text-center p-2 text-white"
+      >
+        <span style="clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 70%,0% 100%);"
+          id="idNumber"
+          class="absolute top-0 right-1 sm:right-3 bg-red-600 px-1 h-8 text-center text-xs text-white font-medium "
+        ></span>
+        <h2
+          id="setup"
+          class=" font-semibold text-lg uppercase"
+        ></h2>
+        <h3
+          id="punchline"
+          class=" text-sm uppercase font-semibold"
+        ></h3>
+      </div>
+      <div
+        class="flex justify-center items-center text-black font-semibold leading-none gap-2 sm:gap-11 flex-wrap mt-3"
+      >
+        <button
+          onclick="onJokeBtnClick()"
+          class=" w-full sm:w-35 py-3 rounded-full bg-linear-to-b from-yellow-200 via-yellow-400 to-black/60 hover:from-red-300 hover:via-red-700 hover:to-black/50 hover:scale-102 hover:text-white  active:scale-99 transition-all ease-in-out duration-200"
+        >
+          New Joke
+        </button>
+        <button
+          onclick="onFavBtnClick()"
+          class="w-full sm:w-35 py-3 rounded-full bg-linear-to-b from-yellow-200 via-yellow-400 to-black/60 hover:from-red-300 hover:via-red-700 hover:to-black/60 hover:scale-102 hover:text-white  active:scale-99 transition-all ease-in-out duration-200"
+        >
+          <i class="fa-solid fa-star"></i> Favourite
+        </button>
+      </div>
+    </article>
+      
+    </div>
+    <h1 class="text-yellow-400 text-center my-2 text-xl font-bold tracking-wider">FAVOURITES</h1>
+      
+      <div id="cards" class="w-fit mx-auto p-2 grid sm:grid-cols-3 grid-cols-2 gap-2 sm:gap-4 justify-center">
+
+      </div>
+      
+  
+  </body>
+  <script>
+    let apiResponse = null;
+    let favouriteData = JSON.parse(localStorage.getItem("jokeData")) || [];
+    const getData = async () => {
+      try {
+        apiResponse = await fetch(
+          "https://official-joke-api.appspot.com/random_joke",
+        );
+        apiResponse = await apiResponse.json();
+        document.querySelector("#idNumber").innerText = apiResponse.id;
+        document.querySelector("#setup").innerText = `"${apiResponse.setup}"`;
+        document.querySelector("#punchline").innerText = apiResponse.punchline;
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getData();
+
+    const onJokeBtnClick = () => {
+      getData();
+    };
+
+    const onFavBtnClick = () => {
+      try {
+        if (!apiResponse) {
+          return;
+        }
+        if (favouriteData.some((each) => each.id === apiResponse.id)) {
+          alert("already in Favourites");
+          return;
+        }
+        favouriteData.unshift(apiResponse);
+        localStorage.setItem("jokeData", JSON.stringify(favouriteData));
+        displayData();
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const displayData = () => {
+      let result = document.querySelector("#cards");
+      result.innerHTML = "";
+      favouriteData.map(
+        (each) =>
+          (result.innerHTML += `<div class="bg-zinc-950 border border-zinc-800 border-t-2 border-t-red-600 rounded-xl p-4 flex flex-col justify-between gap-4 hover:border-yellow-400 hover:shadow-[0px_0px_10px_#dc262633] hover:scale-101 transition-all ease-in-out duration-200 w-full">
+
+  <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
+    <span class=" text-white text-sm font-medium">
+      #${each.id}
+    </span>
+
+    <i class="fa-solid fa-heart text-red-600 text-lg"></i>
+  </div>
+
+  <div class="flex flex-col gap-3 flex-grow">
+    <div class="text-yellow-300 font-semibold text-base">
+      ${each.setup}
+    </div>
+
+    <div class="border-l-2 border-red-600 pl-3 py-1 text-zinc-300 text-sm bg-black">
+      ${each.punchline}
+    </div>
+  </div>
+
+  <div class="border-t border-zinc-800 pt-3">
+    <button
+      onclick="deleteBtnClick(${each.id})"
+      class="w-full px-4 py-2 rounded-lg border border-red-600/70 text-red-500 font-semibold text-sm hover:bg-red-600 hover:border-red-600  hover:text-white active:scale-95 transition-all ease-in-out duration-200"
+    >
+      <i class="fa-solid fa-trash-can mr-1"></i> REMOVE
+    </button>
+  </div>
+
+</div>`),
+      );
+    };
+    displayData();
+
+    const deleteBtnClick = (deleteId) => {
+      favouriteData = favouriteData.filter((each) => each.id != deleteId) || [];
+      localStorage.setItem("jokeData", JSON.stringify(favouriteData));
+      displayData();
+    };
+  </script>
+</html>
